@@ -44,7 +44,10 @@ public class ShuttleManager : MonoBehaviour
     public void Initialize()
     {
         if (!isLoaded)
+        {
+            Debug.LogWarning("Cannot do Initialize, data not loaded");
             return;
+        }
 
         totalLevels = _shuttles.Count;
         currentLevel = _shuttles.Min(p => p.Level);
@@ -68,5 +71,28 @@ public class ShuttleManager : MonoBehaviour
         {
             Debug.LogError("Cannot load shuttle data!");
         }
+    }
+
+    public void NextLevel()
+    {
+        if (!isLoaded)
+        {
+            Debug.LogWarning("Cannot do NextLevel, data not loaded");
+            return;
+        }
+
+        if (currentLevel == totalLevels) {
+            Debug.LogWarning("Cannot do NextLevel, already at highest level");
+            return;
+        }
+
+        currentLevel++;
+        levelLaps = _shuttles.Single(p => p.Level == currentLevel).Laps;
+        currentLap = 1;
+    }
+
+    public void NextLap()
+    {
+
     }
 }

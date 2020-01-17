@@ -38,5 +38,42 @@ namespace Tests
             Assert.AreEqual(7, shuttleManager.levelLaps);
             Assert.AreEqual(1, shuttleManager.currentLap);
         }
+
+        [Test]
+        public void ShuttleManager_NextLevel()
+        {
+            // ReSharper disable once Unity.IncorrectMonoBehaviourInstantiation
+            var shuttleManager = new ShuttleManager();
+
+            shuttleManager.LoadShuttles("shuttles.json");
+            shuttleManager.Initialize();
+
+            Assert.AreEqual(1, shuttleManager.currentLevel);
+            Assert.AreEqual(7, shuttleManager.levelLaps);
+            Assert.AreEqual(1, shuttleManager.currentLap);
+
+            shuttleManager.NextLevel();
+
+            Assert.AreEqual(2, shuttleManager.currentLevel);
+            Assert.AreEqual(8, shuttleManager.levelLaps);
+            Assert.AreEqual(1, shuttleManager.currentLap);
+        }
+
+        [Test]
+        public void ShuttleManager_Max_NextLevel()
+        {
+            // ReSharper disable once Unity.IncorrectMonoBehaviourInstantiation
+            var shuttleManager = new ShuttleManager();
+
+            shuttleManager.LoadShuttles("shuttles.json");
+            shuttleManager.Initialize();
+
+            Assert.AreEqual(1, shuttleManager.currentLevel);
+
+            for (int i = 0; i < 21; i++)
+                shuttleManager.NextLevel();
+
+            Assert.AreEqual(21, shuttleManager.currentLevel);
+        }
     }
 }
