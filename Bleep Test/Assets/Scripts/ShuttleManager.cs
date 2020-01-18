@@ -24,22 +24,31 @@ public class ShuttleLevel
     public int Level { get; set; }
     public int Laps { get; set; }
     public int Distance { get; set; }
-    public double LapTime { get; set; }
+    public float LapTime { get; set; }
     public double Speed { get; set; }
     public int TotalDistance { get; set; }
-    public double TotalTime { get; set; }
+    public float TotalTime { get; set; }
 }
 
 public class ShuttleManager : MonoBehaviour
 {
     public bool isLoaded = false;
     public int totalLevels;
-    public int currentLevel;
+    public int currentLevelNumber;
 
     public int levelLaps;
     public int currentLap;
 
+    public bool isStarted;
+
+    public AudioManager audioManager;
+
     private List<ShuttleLevel> _shuttles = new List<ShuttleLevel>();
+    private ShuttleLevel _currentLevel;
+
+    private int _totalDistance;
+    private float _targetTime;
+    private float _totalTime;
 
     public void Initialize()
     {
@@ -50,9 +59,15 @@ public class ShuttleManager : MonoBehaviour
         }
 
         totalLevels = _shuttles.Count;
-        currentLevel = _shuttles.Min(p => p.Level);
-        levelLaps = _shuttles.Single(p => p.Level == currentLevel).Laps;
+
+        _currentLevel = _shuttles.OrderBy(p => p.Level).First();
+        currentLevelNumber = _currentLevel.Level;
+        levelLaps = _currentLevel.Laps;
+        _targetTime = _currentLevel.LapTime;
+
         currentLap = 1;
+        _totalDistance = 0;
+        _totalTime = 0;
     }
 
     public void LoadShuttles(string fileName)
@@ -63,6 +78,7 @@ public class ShuttleManager : MonoBehaviour
 
         if (File.Exists(filePath))
         {
+            Debug.Log($"Loading shuttle data from {fileName}");
             string dataAsJson = File.ReadAllText(filePath);
             _shuttles = JsonConvert.DeserializeObject<List<ShuttleLevel>>(dataAsJson);
             isLoaded = true;
@@ -81,18 +97,74 @@ public class ShuttleManager : MonoBehaviour
             return;
         }
 
-        if (currentLevel == totalLevels) {
+        if (currentLevelNumber == totalLevels)
+        {
             Debug.LogWarning("Cannot do NextLevel, already at highest level");
             return;
         }
 
-        currentLevel++;
-        levelLaps = _shuttles.Single(p => p.Level == currentLevel).Laps;
+        currentLevelNumber++;
+        _currentLevel = _shuttles.Single(p => p.Level == currentLevelNumber);
+        levelLaps = _currentLevel.Laps;
         currentLap = 1;
+    }
+
+    public int GetTotalDistance()
+    {
+        return _totalDistance;
+    }
+
+    public float GetLapProgress()
+    {
+        return 1 - (_targetTime / _currentLevel.LapTime);
+    }
+
+    public float GetLevelProgress()
+    {
+        return (currentLap - 1.0f) / _currentLevel.Laps;
+    }
+
+    public float GetTotalTime()
+    {
+        return _totalTime;
     }
 
     public void NextLap()
     {
+        currentLap++;
+        _totalDistance += _currentLevel.Distance;
 
+        audioManager.DoBeep();
+        
+        if (currentLap > _currentLevel.Laps)
+        {
+            NextLevel();
+        }
+    }
+
+    public void DoStart()
+    {
+        isStarted = true;
+    }
+
+    public void DoStop()
+    {
+        isStarted = false;
+    }
+
+    private void Update()
+    {
+        if (_currentLevel != null && isStarted)
+        {
+            _targetTime -= Time.deltaTime;
+            _totalTime += Time.deltaTime;
+
+            if (_targetTime <= 0)
+            {
+                _targetTime = _currentLevel.LapTime;
+
+                NextLap();
+            }
+        }
     }
 }
