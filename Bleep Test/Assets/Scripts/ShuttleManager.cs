@@ -104,9 +104,17 @@ public class ShuttleManager : MonoBehaviour
         }
 
         currentLevelNumber++;
+        currentLap = 1;
+
+        StartLevel();
+    }
+
+    public void StartLevel()
+    {
         _currentLevel = _shuttles.Single(p => p.Level == currentLevelNumber);
         levelLaps = _currentLevel.Laps;
-        currentLap = 1;
+
+        audioManager.DoLevel(currentLevelNumber);
     }
 
     public int GetTotalDistance()
@@ -134,17 +142,23 @@ public class ShuttleManager : MonoBehaviour
         currentLap++;
         _totalDistance += _currentLevel.Distance;
 
-        audioManager.DoBeep();
-        
         if (currentLap > _currentLevel.Laps)
         {
             NextLevel();
+        }
+        else
+        {
+            audioManager.DoBeep();
         }
     }
 
     public void DoStart()
     {
         isStarted = true;
+
+        StartLevel();
+
+        audioManager.DoLevel(currentLevelNumber);
     }
 
     public void DoStop()
