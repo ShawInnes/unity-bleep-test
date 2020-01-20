@@ -37,6 +37,7 @@ public class ShuttleManager : MonoBehaviour
 
     public int levelLaps;
     public int currentLap;
+    public double currentSpeed;
 
     public bool isStarted;
 
@@ -48,6 +49,7 @@ public class ShuttleManager : MonoBehaviour
     private int _totalDistance;
     private float _targetTime;
     private float _totalTime;
+    private float _currentLevelLapTime;
 
     public void Initialize()
     {
@@ -59,14 +61,13 @@ public class ShuttleManager : MonoBehaviour
 
         totalLevels = _shuttles.Count;
 
-        _currentLevel = _shuttles.OrderBy(p => p.Level).First();
-        currentLevelNumber = _currentLevel.Level;
-        levelLaps = _currentLevel.Laps;
-        _targetTime = _currentLevel.LapTime;
-
-        currentLap = 1;
         _totalDistance = 0;
         _totalTime = 0;
+
+        currentLevelNumber = 1;
+        currentLap = 1;
+
+        LoadLevel();
     }
 
     public void LoadShuttles(string fileName)
@@ -88,34 +89,6 @@ public class ShuttleManager : MonoBehaviour
         }
     }
 
-    public void NextLevel()
-    {
-        if (!isLoaded)
-        {
-            Debug.LogWarning("Cannot do NextLevel, data not loaded");
-            return;
-        }
-
-        if (currentLevelNumber == totalLevels)
-        {
-            Debug.LogWarning("Cannot do NextLevel, already at highest level");
-            return;
-        }
-
-        currentLevelNumber++;
-        currentLap = 1;
-
-        StartLevel();
-    }
-
-    public void StartLevel()
-    {
-        _currentLevel = _shuttles.Single(p => p.Level == currentLevelNumber);
-        levelLaps = _currentLevel.Laps;
-
-        audioManager.DoLevel(currentLevelNumber);
-    }
-
     public int GetTotalDistance()
     {
         return _totalDistance;
@@ -123,7 +96,7 @@ public class ShuttleManager : MonoBehaviour
 
     public float GetLapProgress()
     {
-        return 1 - (_targetTime / _currentLevel.LapTime);
+        return 1 - (_targetTime / _currentLevelLapTime);
     }
 
     public float GetLevelProgress()
@@ -151,13 +124,53 @@ public class ShuttleManager : MonoBehaviour
         }
     }
 
+    public void NextLevel()
+    {
+        if (!isLoaded)
+        {
+            Debug.LogWarning("Cannot do NextLevel, data not loaded");
+            return;
+        }
+
+        if (currentLevelNumber == totalLevels)
+        {
+            Debug.LogWarning("Cannot do NextLevel, already at highest level");
+            return;
+        }
+
+        currentLevelNumber++;
+        currentLap = 1;
+
+        StartLevel();
+    }
+
+    public void LoadLevel()
+    {
+        _currentLevel = _shuttles.Single(p => p.Level == currentLevelNumber);
+
+        levelLaps = _currentLevel.Laps;
+        currentSpeed = _currentLevel.Speed;
+        levelLaps = _currentLevel.Laps;
+        _currentLevelLapTime = _currentLevel.LapTime;
+        _targetTime = _currentLevelLapTime;
+    }
+
+    public void StartLevel()
+    {
+        LoadLevel();
+
+        audioManager.DoBeep();
+        audioManager.DoLevel(currentLevelNumber);
+    }
+
     public void DoStart()
     {
+        if (isStarted)
+            return;
+
         isStarted = true;
 
         StartLevel();
-
-        audioManager.DoLevel(currentLevelNumber);
     }
 
     public void DoStop()
@@ -174,7 +187,7 @@ public class ShuttleManager : MonoBehaviour
 
             if (_targetTime <= 0)
             {
-                _targetTime = _currentLevel.LapTime;
+                _targetTime = _currentLevelLapTime;
 
                 NextLap();
             }

@@ -90,6 +90,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   loadingBar: {fileID: 7921003691794366782}
   center: {fileID: 1045761019350025804}
+  useSmoothing: 0
+  smoothingFactor: 3
   currentAmount: 0.624
   barThickness: 10.5
   barColor: {r: 0.9622642, g: 0.35857958, b: 0.87652475, a: 1}
@@ -177,7 +179,6 @@ GameObject:
   - component: {fileID: 1045761019350025804}
   - component: {fileID: 4136074114633471682}
   - component: {fileID: 6606181033464745721}
-  - component: {fileID: 1598876327928598798}
   m_Layer: 5
   m_Name: Center
   m_TagString: Untagged
@@ -238,20 +239,5 @@ MonoBehaviour:
   m_FillAmount: 1
   m_FillClockwise: 1
   m_FillOrigin: 0
-  m_UseSpriteMesh: 0
+  m_UseSpriteMesh: 1
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &1598876327928598798
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8637356655474844322}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: cfabb0440166ab443bba8876756fdfa9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  m_EffectColor: {r: 0, g: 0, b: 0, a: 0.5}
-  m_EffectDistance: {x: 1, y: -1}
-  m_UseGraphicAlpha: 1

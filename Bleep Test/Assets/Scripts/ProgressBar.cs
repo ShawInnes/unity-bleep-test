@@ -14,21 +14,12 @@ public class ProgressBar : MonoBehaviour
     public float smoothingFactor = 3;
 
     [Range(0, 1)]
-    public float currentAmount;
+    public float currentAmount = 0f;
 
     [Range(1, 50)]
     public float barThickness;
 
     public Color barColor;
-
-    private void Start()
-    {
-        var bar = loadingBar.GetComponent<Image>();
-        var originalSmoothing = useSmoothing;
-        useSmoothing = false;
-        bar.fillAmount = 0.0f;
-        useSmoothing = originalSmoothing;
-    }
 
     private void Update()
     {
