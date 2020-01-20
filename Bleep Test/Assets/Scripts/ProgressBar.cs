@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using UnityEditor.Graphs;
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 
 [ExecuteInEditMode]
@@ -14,6 +10,9 @@ public class ProgressBar : MonoBehaviour
     [SerializeField]
     private Transform center;
 
+    public bool useSmoothing = false;
+    public float smoothingFactor = 3;
+
     [Range(0, 1)]
     public float currentAmount;
 
@@ -22,11 +21,20 @@ public class ProgressBar : MonoBehaviour
 
     public Color barColor;
 
+    private void Start()
+    {
+        var bar = loadingBar.GetComponent<Image>();
+        var originalSmoothing = useSmoothing;
+        useSmoothing = false;
+        bar.fillAmount = 0.0f;
+        useSmoothing = originalSmoothing;
+    }
+
     private void Update()
     {
         var bar = loadingBar.GetComponent<Image>();
 
-        bar.fillAmount = currentAmount;
+        bar.fillAmount = useSmoothing ? Mathf.Lerp(bar.fillAmount, currentAmount, Time.deltaTime * smoothingFactor) : currentAmount;
         bar.color = barColor;
 
         var rt = center.GetComponent<Image>().rectTransform;
